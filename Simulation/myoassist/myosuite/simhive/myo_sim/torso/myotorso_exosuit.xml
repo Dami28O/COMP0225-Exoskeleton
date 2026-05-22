@@ -1,0 +1,80 @@
+<mujoco model="MyoExoTorso">
+  <!-- =================================================
+  Copyright 2024
+  Model	:: MyoTorso (MuJoCoV3.0)
+  Author	::  Rohan Walia, Morgane Billot, Kevin Garzon-Aguirre, Swathika Subramanian, Huiyi Wang,
+                 Mohamed Irfan Refai, Guillaume Durandau, Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano
+  License	:: Under Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+  ====================================================== -->
+
+  <include file="../scene/myosuite_scene.xml"/>
+  <include file="../head/assets/myohead_simple_assets.xml"/>
+  <include file="../../../../models/80muscle/myoLeg80_HMEDI/assets/myolegs_assets_HMEDI.xml"/>
+  <include file="assets/myotorso_assets.xml"/>
+  <compiler meshdir=".." texturedir=".."/>
+
+
+
+  <worldbody>
+    <body name="human" pos="-0.4 0.1 0.52">
+      <joint name="root_x" type="slide" axis="1 0 0"/>
+      <joint name="root_z" type="slide" axis="0 0 1"/>
+      <joint name="root_pitch" type="hinge" axis="0 1 0"/>
+
+      <include file="assets/myotorso_chain.xml"/>
+      <include file="../../../../models/80muscle/myoLeg80_HMEDI/assets/myolegs_chain_HMEDI.xml"/>
+    </body>
+
+
+
+   <site name="sensorsurf2" pos="-0.5 0.1 0.32" size="0.25 0.25 0.03" type="box" rgba="0.3 0.2 0.1 0.3"/>
+   <body name="chair" pos="-0.5 0.1 0.32" euler = "0 0 -1.57">
+
+    <!-- seat -->
+    <geom name="seat"
+          type="box"
+          size="0.25 0.25 0.03"
+          rgba="0.5 0.3 0.2 1"
+          contype="1"
+          conaffinity="1"
+          friction="1.5 0.1 0.1"
+          condim = "3"/>
+    <site name="sensorsurf" pos="0 -0.22 0.25" size="0.25 0.03 0.25" type="box" rgba="0.3 0.2 0.1 0.3"/>
+
+    <!-- backrest -->
+    <geom name="back"
+          type="box"
+          pos="0 -0.22 0.25"
+          size="0.25 0.03 0.25"
+          rgba="0.5 0.3 0.2 1"/>
+
+    <!-- legs -->
+    <geom pos="0.2 0.2 -0.45" type="box" size="0.02 0.02 0.45"/>
+    <geom pos="-0.2 0.2 -0.45" type="box" size="0.02 0.02 0.45"/>
+    <geom pos="0.2 -0.2 -0.45" type="box" size="0.02 0.02 0.45"/>
+    <geom pos="-0.2 -0.2 -0.45" type="box" size="0.02 0.02 0.45"/>
+
+   </body>
+
+  </worldbody>
+
+  <sensor>
+     <touch name="touchsensor" site="sensorsurf" />
+ </sensor>
+ <sensor>
+     <touch name="touchsensor2" site="sensorsurf2" />
+ </sensor>
+
+  <keyframe>
+    <key name='stand' qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.57 0 0 0 0 1.75 0 0 0 0 0 0 0 0 1.57 0 0 0 0 1.75 0 0 0 0 0 0 0 0"/>
+  </keyframe>
+
+  
+  <!-- <keyframe>
+    <key name='stand' qpos"-0.0794237 0.0416331 -2.02239 -1.26045 0.0498676 0.0991725 -0.000280884 -6.5071e-05 -0.810514 -0.232914 0.00904551 0.00375134 -0.25709 0.012252 0.00373287 -0.291183 0.0124956 0.0030726 -0.321481 0.00940039 0.00286198 -0.518925 -0.333517 -0.215654 0.00693506 0.00124696 1.73398 0.00474743 0.262334 -0.494714 0.0467324 -0.539188 -0.0283318 -0.0155987 -1.41963 -0.446896 0.0495925 0.174705 -0.0068398 0.00125884 1.73038 0.00495095 -0.262305 -0.49073 0.352404 -0.539217 -0.0286979 -0.0153539 -1.41616"
+/>
+
+        "-0.0794255 0.0416353 -2.02239 -1.26045 0.0498677 0.0991723 -0.000280885 -6.50713e-05 -0.810514 -0.232915 0.00904553 0.00375133 -0.25709 0.012252 0.00373287 -0.291183 0.0124956 0.00307259 -0.321481 0.00940041 0.00286197 -0.51893 -0.333511 -0.215651 0.00693506 0.00124695 1.73397 0.00474786 0.262334 -0.494711 0.0467399 -0.539187 -0.0283321 -0.0155984 -1.41961 -0.4469 0.0495922 0.174705 -0.00683979 0.00125884 1.73037 0.00495128 -0.262305 -0.490732 0.352404 -0.539216 -0.0286982 -0.0153536 -1.41615"
+
+  </keyframe> -->
+</mujoco>

@@ -1,0 +1,39 @@
+<mujoco>
+  <!--
+  Egocentric Camera Configuration for VAS2 Vision Integration
+
+  This file defines cameras attached to the humanoid head for visual perception.
+  Include this in worldbody after the human model is loaded.
+
+  Camera Coordinate System (relative to Head body):
+  - Head local frame: y-axis points up (along neck), z-axis points forward (nose direction)
+  - Forward vision: Looking along +z axis
+  - Downward vision: Looking along -y axis (towards feet)
+
+  Usage:
+    <include file="egocentric_cameras.xml"/>
+
+  Cameras defined:
+    - ego_rgb: Forward-looking RGB camera (80° FOV, primary vision)
+    - ego_depth: Forward-looking depth camera (same position as ego_rgb)
+    - ego_down: Downward-looking camera for terrain/foot placement (90° FOV)
+    - ego_left/ego_right: Stereo pair for depth estimation (optional)
+    - third_person: External tracking camera (for visualization only)
+
+  Author: VAS2 Vision Integration
+  Date: 2026-01-29
+  -->
+
+  <!-- External visualization camera (not for policy, visualization only) -->
+  <worldbody>
+    <!-- Third-person tracking camera -->
+    <camera name="third_person" pos="-2.5 -2.5 2.0" xyaxes="1 -1 0 0.5 0.5 1" mode="trackcom" fovy="60"/>
+
+    <!-- Side view camera -->
+    <camera name="side_view" pos="0 -3 1.5" xyaxes="1 0 0 0 0.5 1" mode="trackcom" fovy="60"/>
+
+    <!-- Top-down view -->
+    <camera name="top_view" pos="0 0 5" xyaxes="1 0 0 0 1 0" mode="trackcom" fovy="60"/>
+  </worldbody>
+
+</mujoco>

@@ -1,0 +1,405 @@
+<mujoco model="hipexo_v2_real_inertia">
+    <compiler angle="radian" meshdir="meshes" balanceinertia="true"/>
+
+    <option gravity="0 0 -9.81"/>
+
+    <!-- ==================== DEFAULT CLASSES ==================== -->
+    <!--
+        CLASS STRUCTURE:
+        ┌─────────────────────────────────────────────────────────────────────────┐
+        │ GEOM CLASSES (충돌 설정) - 색상은 material로 override                   │
+        ├──────────────┬──────────┬─────────────┬─────────────────────────────────┤
+        │ Class        │ contype  │ conaffinity │ 적용 파트                       │
+        ├──────────────┼──────────┼─────────────┼─────────────────────────────────┤
+        │ collision    │ 1        │ 1           │ backframe, backpipe, joint_base │
+        │              │          │             │ leg, pulley, tsa_motor_pipe     │
+        │ visual       │ 0        │ 0           │ connector, hip_support          │
+        └──────────────┴──────────┴─────────────┴─────────────────────────────────┘
+
+        ┌─────────────────────────────────────────────────────────────────────────┐
+        │ JOINT CLASSES (물리 속성)                                               │
+        ├──────────────────┬───────────┬─────────┬───────────┬────────────────────┤
+        │ Class            │ stiffness │ damping │ armature  │ 적용 조인트        │
+        ├──────────────────┼───────────┼─────────┼───────────┼────────────────────┤
+        │ structural_joint │ 1.0       │ 1.0     │ 0.01      │ backpipe, pipe     │
+        │ active_joint     │ 0         │ 0.1     │ 0.05      │ hip, leg           │
+        │ passive_joint    │ 0         │ 0.1     │ 0         │ connector, support │
+        └──────────────────┴───────────┴─────────┴───────────┴────────────────────┘
+
+        Note: 내부 충돌은 <contact><exclude>로 개별 제외됨
+              색상은 material로 override (L/R 구분)
+    -->
+    <default>
+        <!-- Exoskeleton-specific defaults wrapped in named class -->
+        <default class="exo">
+            <!-- Base settings for exoskeleton -->
+            <joint stiffness="0" damping="0.5" armature="0.01"/>
+            <geom contype="1" conaffinity="1"/>
+
+            <!-- ===== GEOM CLASSES ===== -->
+            <!-- Collision enabled (default for most parts) -->
+            <default class="exo/collision">
+                <geom contype="1" conaffinity="1"/>
+            </default>
+
+            <!-- Visual only - no collision (connector, hip_support) -->
+            <default class="exo/visual">
+                <geom contype="0" conaffinity="0"/>
+            </default>
+
+            <!-- ===== JOINT CLASSES ===== -->
+            <!-- Structural joints (backpipe, pipe) - stiff connection -->
+            <default class="exo/structural_joint">
+                <joint stiffness="1" damping="1.0" armature="0.01" limited="true"/>
+            </default>
+
+            <!-- Active joints (hip, leg) - actuated -->
+            <default class="exo/active_joint">
+                <joint stiffness="0" damping="0.1" armature="0.05" limited="true"/>
+            </default>
+
+            <!-- Passive joints (connector, hip_support) - free rotation -->
+            <default class="exo/passive_joint">
+                <joint stiffness="0" damping="0.1" armature="0" limited="true"/>
+            </default>
+        </default>
+    </default>
+
+    <!-- ==================== ASSETS ==================== -->
+    <asset>
+        <!-- Materials for color distinction -->
+        <material name="mat_backframe" rgba="0.2 0.2 0.2 1" specular="0.5" shininess="0.5"/>
+        <material name="mat_backpipe" rgba="0.5 0.5 0.5 1" specular="0.3" shininess="0.2"/>
+        <material name="mat_connector" rgba="0.5 0.5 0.5 1" specular="0.3" shininess="0.2"/>
+
+        <material name="mat_joint" rgba="0.4 0.2 0.2 1" specular="0.7" shininess="0.6"/>
+        <material name="mat_pulley" rgba="0.2 0.4 0.2 1" specular="0.6" shininess="0.4"/>
+        <material name="mat_leg" rgba="0.2 0.2 0.4 1" specular="0.4" shininess="0.3"/>
+        <material name="mat_hip_support" rgba="0.5 0.5 0.2 1" specular="0.4" shininess="0.3"/>
+
+        <!-- Meshes -->
+        <mesh name="backframe_base_bottom" file="../mesh/TSAmesh/backframe_base_bottom.stl"/>
+        <mesh name="backframe_base_top" file="../mesh/TSAmesh/backframe_base_top.stl"/>
+        <mesh name="backpipe_half" file="../mesh/TSAmesh/backpipe_half.stl"/>
+        <mesh name="connector" file="../mesh/TSAmesh/connector.stl"/>
+        <mesh name="hip_support" file="../mesh/TSAmesh/hip_support.stl"/>
+        <mesh name="joint_base" file="../mesh/TSAmesh/joint_base.stl"/>
+        <mesh name="joint_base_R" file="../mesh/TSAmesh/joint_base_R.stl"/>
+        <mesh name="leg" file="../mesh/TSAmesh/leg.stl"/>
+        <mesh name="leg_R" file="../mesh/TSAmesh/leg_R.stl"/>
+        <mesh name="pulley" file="../mesh/TSAmesh/pulley.stl"/>
+        <mesh name="pulley_R" file="../mesh/TSAmesh/pulley_R.stl"/>
+        <mesh name="tsa_motor_pipe" file="../mesh/TSAmesh/tsa_motor_pipe.stl"/>
+    </asset>
+
+    <!-- ==================== WORLDBODY ==================== -->
+    <worldbody>
+        <!-- <light directional="true" pos="-0.5 0.5 3" dir="0 0 -1"/> -->
+        <!-- <geom name="floor" pos="0 0 0" size="2 2 0.1" type="plane" rgba="0.9 0.85 0.7 1"/> -->
+
+        <body name="backframe_base_bottom" pos="0 -0.16 1" euler="-0.14 0 0">
+            <freejoint name="root"/>
+            <geom name="backframe_base_bottom_geom" type="mesh" mesh="backframe_base_bottom"
+                  class="exo/collision" material="mat_backframe"/>
+            <!-- backframe_base_bottom: from real_inertia.txt (at CoM) -->
+            <inertial mass="0.57657479" pos="0 0.00694708 0.00196867"
+                      fullinertia="0.00049371 0.00140837 0.00117938 0 0 -0.00001121"/>
+
+            <site name="backframe_to_shoulder_bottom_L" pos="-0.075 0 0.037"/>
+            <site name="backframe_to_shoulder_bottom_R" pos="0.075 0 0.037"/>
+
+            <!-- ==================== BACKFRAME TOP ==================== -->
+            <body name="backframe_base_top" pos="0 -0.001 0.05" euler="0 0 0">
+                <geom name="backframe_base_top_geom" type="mesh" mesh="backframe_base_top"
+                      class="exo/collision" material="mat_backframe"/>
+                <!-- backframe_base_top: from real_inertia.txt (at CoM) -->
+                <inertial mass="2.21336648" pos="0.00056857 -0.04887217 0.22887210"
+                          fullinertia="0.02314268 0.02453637 0.00435991 -0.00004839 0.00024189 -0.00293655"/>
+
+                <!-- Sites for shoulder strap (on backframe) -->
+                <!-- <site name="backframe_to_shoulder_top_L" pos="-0.0398 -0.028 0.386"/>
+                <site name="backframe_to_shoulder_top_R" pos="0.0398  -0.028 0.386"/>
+                <site name="backframe_to_shoulder_bottom_L" pos="-0.036 -0.028 0.335"/>
+                <site name="backframe_to_shoulder_bottom_R" pos="0.036 -0.028 0.335"/> -->
+
+                <site name="backframe_to_shoulder_top_L" pos="-0.046 -0.035 0.395"/>
+                <site name="backframe_to_shoulder_top_R" pos="0.046 -0.035 0.395"/>
+
+
+                <!-- Sites for closed loop ball joints -->
+                <site name="backframe_to_connector_L" pos="-0.104 -0.04317 0.35992"/>
+                <site name="backframe_to_connector_R" pos="0.104 -0.04317 0.35992"/>
+
+            </body>
+
+            <!-- ==================== LEFT SIDE ==================== -->
+            <body name="backpipe_half_L" pos="-0.16 0.183 0.035" euler="0.16 0 0">
+                <joint name="backpipe_joint_L" type="hinge" axis="1 0 0" pos="0.15 -0.22 0"
+                       class="exo/structural_joint" range="-0.3 0.3"/>
+                <geom name="backpipe_half_L_geom" type="mesh" mesh="backpipe_half"
+                      class="exo/visual" material="mat_backpipe"/>
+                <!-- backpipe_half: from real_inertia.txt (at CoM) -->
+                <inertial mass="0.05548025" pos="0.03328886 -0.14909289 0"
+                          fullinertia="0.00029720 0.00012446 0.00041663 -0.00012871 0 0"/>
+
+                <body name="joint_base_L" pos="-0.034 0 -0.098" euler="0 0.119 0">
+                    <joint name="pipe_joint_L" type="hinge" axis="0 -1 0" pos="0.0225 -0.022 0.101"
+                           class="exo/structural_joint" range="-0.5 0.5"/>
+                    <geom name="joint_base_L_geom" type="mesh" mesh="joint_base"
+                          class="exo/collision" material="mat_joint"/>
+                    <!-- joint_base (L): from real_inertia.txt (at CoM) -->
+                    <inertial mass="0.32399464" pos="0.00261229 -0.02913209 0.02882661"
+                              fullinertia="0.00088962 0.00049096 0.00043956 0.00000556 0.00002313 -0.00024432"/>
+
+                    <!-- Pulley & Leg -->
+                    <body name="pulley_L" pos="0 0 0" euler="0 0 0">
+                        <joint name="hip_joint_L" type="hinge" axis="-1 0 0" pos="0 0 0"
+                               class="exo/active_joint" range="-2.2 0.3"/>
+                        <geom name="pulley_L_geom" type="mesh" mesh="pulley"
+                              class="exo/collision" material="mat_pulley"/>
+                        <!-- pulley (L): from real_inertia.txt (at CoM) -->
+                        <inertial mass="0.09716543" pos="-0.00013778 -0.01038359 -0.02273681"
+                                  fullinertia="0.00023246 0.00017091 0.00007127 -0.00000035 -0.00000025 -0.00001507"/>
+
+                        <body name="leg_L" pos="0 0 -0.0665" euler="0 0 0">
+                            <joint name="leg_joint_L" type="hinge" axis="0 1 0" pos="0 0 0"
+                                   class="exo/active_joint" range="-0.3 1.5708"/>
+                            <geom name="leg_L_geom" type="mesh" mesh="leg"
+                                  class="exo/visual" material="mat_leg"/>
+                            <!-- leg (L): from real_inertia.txt (at CoM) -->
+                            <inertial mass="0.40720231" pos="0.01271925 -0.07381513 -0.07182682"
+                                      fullinertia="0.00185795 0.00149450 0.00091057 -0.00017231 -0.00021843 0.00058454"/>
+
+
+                            <geom name="leg_in_L_contact" class="exo/collision" type="cylinder" size="0.005 0.04" pos="0.103 -0.104 -0.115"/>
+                            <geom name="leg_out_L_contact" class="exo/collision" type="cylinder" size="0.005 0.04" pos="0.002 -0.045 -0.115"/>
+
+
+                            <!-- Sites for leg_L strap -->
+                            <!-- <site name="leg_L_in_to_thigh_L_in" pos="0.1 -0.1 -0.140"/> -->
+                            <!-- <site name="leg_L_out_to_thigh_L_out" pos="0.1 -0.1 -0.085"/> -->
+
+                            <site name="leg_top_in_L" pos="0.1 -0.095 -0.09"/>
+                            <site name="leg_top_out_L" pos="0.02 -0.05 -0.09"/>
+                            <site name="leg_bottom_in_L" pos="0.1 -0.095 -0.13"/>
+                            <site name="leg_bottom_out_L" pos="0.02 -0.05 -0.13"/>
+                        </body>
+                    </body>
+
+                    <!-- Hip support -->
+                    <body name="hip_support_L" pos="0.019 0 0" euler="0 0 0">
+                        <joint name="hip_support_joint_L" type="hinge" axis="1 0 0" pos="0 0 0"
+                               class="exo/passive_joint" range="-0.5 0.5"/>
+                        <geom name="hip_support_L_geom" type="mesh" mesh="hip_support"
+                              class="exo/collision" material="mat_hip_support"/>
+                        <!-- hip_support (L): from real_inertia.txt (at CoM) -->
+                        <inertial mass="0.01250169" pos="0.00570428 -0.00749738 0"
+                                  fullinertia="0.00000658 0.00000607 0.00000078 -0.00000012 0 0"/>
+
+                        <!-- Sites for hip_L strap -->
+                        <site name="hip_L_to_pelvis_L_top" pos="0.008 -0.016 0.025"/>
+                        <site name="hip_L_to_pelvis_L_bottom" pos="0.008 -0.016 -0.025"/>
+                    </body>
+
+                    <!-- TSA motor pipe & connector -->
+                    <body name="tsa_motor_pipe_L" pos="0 -0.170 0.441" euler="0.235 0 0">
+                        <geom name="tsa_motor_pipe_L_geom" type="mesh" mesh="tsa_motor_pipe"
+                              class="exo/collision" material="mat_joint"/>
+                        <!-- tsa_motor_pipe (L): from real_inertia.txt (at CoM) -->
+                        <inertial mass="0.68795278" pos="0.00008014 -0.00000370 0.04838748"
+                                  fullinertia="0.00372618 0.00373338 0.00014605 0 -0.00000075 0.00000005"/>
+
+                        <body name="connector_L" pos="0.0624 0 0.0713" euler="0 0.914 1.5708">
+                            <joint name="connector_joint_L" type="hinge" axis="-1 0 0" pos="-0.005 0 -0.034"
+                                   class="exo/passive_joint" range="-0.8 0.8"/>
+                            <geom name="connector_L_geom" type="mesh" mesh="connector"
+                                  class="exo/visual" material="mat_connector"/>
+                            <!-- connector (L): from real_inertia.txt (at CoM) -->
+                            <inertial mass="0.00278131" pos="0 0 -0.02005725"
+                                      fullinertia="0.00000038 0.00000042 0.00000007 0 0 0"/>
+
+                            <!-- Site for closed loop constraint -->
+                            <site name="connector_L_to_backframe" pos="0 0 0"/>
+                        </body>
+                    </body>
+                </body>
+            </body>
+
+            <!-- ==================== RIGHT SIDE ==================== -->
+            <body name="backpipe_half_R" pos="0.16 0.183 0.035" euler="0.16 0 0">
+                <joint name="backpipe_joint_R" type="hinge" axis="1 0 0" pos="-0.15 -0.22 0"
+                       class="exo/structural_joint" range="-0.3 0.3"/>
+                <geom name="backpipe_half_R_geom" type="mesh" mesh="backpipe_half" euler="0 3.14159 0"
+                      class="exo/visual" material="mat_backpipe"/>
+                <!-- backpipe_half (R): from real_inertia.txt (at CoM), X-mirrored -->
+                <inertial mass="0.05548025" pos="-0.03328886 -0.14909289 0"
+                          fullinertia="0.00029720 0.00012446 0.00041663 0.00012871 0 0"/>
+
+                <body name="joint_base_R" pos="0.034 0 -0.098" euler="0 -0.119 0">
+                    <joint name="pipe_joint_R" type="hinge" axis="0 -1 0" pos="-0.0225 -0.022 0.101"
+                           class="exo/structural_joint" range="-0.5 0.5"/>
+                    <geom name="joint_base_R_geom" type="mesh" mesh="joint_base_R"
+                          class="exo/collision" material="mat_joint"/>
+                    <!-- joint_base_R: from real_inertia.txt (at CoM) -->
+                    <inertial mass="0.32399464" pos="-0.00261229 -0.02913265 0.02882577"
+                              fullinertia="0.00088962 0.00049097 0.00043955 -0.00000556 -0.00002313 -0.00024432"/>
+
+                    <!-- Pulley & Leg -->
+                    <body name="pulley_R" pos="0 0 0" euler="0 0 0">
+                        <joint name="hip_joint_R" type="hinge" axis="1 0 0" pos="0 0 0"
+                               class="exo/active_joint" range="-0.3 2.2"/>
+                        <geom name="pulley_R_geom" type="mesh" mesh="pulley_R"
+                              class="exo/collision" material="mat_pulley"/>
+                        <!-- pulley_R: from real_inertia.txt (at CoM) -->
+                        <inertial mass="0.09716543" pos="0.00012873 -0.01038358 -0.02273681"
+                                  fullinertia="0.00023246 0.00017091 0.00007127 0.00000036 0.00000022 -0.00001507"/>
+
+                        <body name="leg_R" pos="0 0 -0.0665" euler="0 0 0">
+                            <joint name="leg_joint_R" type="hinge" axis="0 1 0" pos="0 0 0"
+                                   class="exo/active_joint" range="-1.57 0.3"/>
+                            <geom name="leg_R_geom" type="mesh" mesh="leg_R"
+                                  class="exo/visual" material="mat_leg"/>
+                            <!-- leg_R: from real_inertia.txt (at CoM) -->
+                            <inertial mass="0.40720231" pos="-0.01271929 -0.07381513 -0.07182694"
+                                      fullinertia="0.00185796 0.00149450 0.00091057 0.00017231 0.00021842 0.00058454"/>
+
+                            <geom name="leg_in_R_contact" class="exo/collision" type="cylinder" size="0.005 0.04" pos="-0.103 -0.104 -0.115"/>
+                            <geom name="leg_out_R_contact" class="exo/collision" type="cylinder" size="0.005 0.04" pos="-0.002 -0.045 -0.115"/>
+
+                            <!-- Sites for leg_R strap -->
+                            <!-- <site name="leg_R_in_to_thigh_R_in" pos="-0.1 -0.1 -0.11"/> -->
+                            <!-- <site name="leg_R_out_to_thigh_R_out" pos="-0.01 -0.05 -0.11"/> -->
+
+                            <site name="leg_top_in_R" pos="-0.1 -0.095 -0.09"/>
+                            <site name="leg_top_out_R" pos="-0.02 -0.05 -0.09"/>
+                            <site name="leg_bottom_in_R" pos="-0.1 -0.095 -0.13"/>
+                            <site name="leg_bottom_out_R" pos="-0.02 -0.05 -0.13"/>
+                            <!-- <site name="leg_R_out_to_thigh_R_out" pos="-0.01 -0.05 -0.11"/> -->
+                        </body>
+                    </body>
+
+                    <!-- Hip support -->
+                    <body name="hip_support_R" pos="-0.019 0 0" euler="0 0 0">
+                        <joint name="hip_support_joint_R" type="hinge" axis="-1 0 0" pos="0 0 0"
+                               class="exo/passive_joint" range="-0.5 0.5"/>
+                        <geom name="hip_support_R_geom" type="mesh" mesh="hip_support" euler="0 3.14159 0"
+                              class="exo/collision" material="mat_hip_support"/>
+                        <!-- hip_support (R): from real_inertia.txt (at CoM), X-mirrored -->
+                        <inertial mass="0.01250169" pos="-0.00570428 -0.00749738 0"
+                                  fullinertia="0.00000658 0.00000607 0.00000078 0.00000012 0 0"/>
+
+                        <!-- Sites for hip_R strap -->
+                        <site name="hip_R_to_pelvis_R_top" pos="-0.008 -0.016 0.025"/>
+                        <site name="hip_R_to_pelvis_R_bottom" pos="-0.008 -0.016 -0.025"/>
+                    </body>
+
+                    <!-- TSA motor pipe & connector -->
+                    <body name="tsa_motor_pipe_R" pos="0 -0.170 0.441" euler="0.235 0 3.14159">
+                        <geom name="tsa_motor_pipe_R_geom" type="mesh" mesh="tsa_motor_pipe"
+                              class="exo/collision" material="mat_joint"/>
+                        <!-- tsa_motor_pipe (R): from real_inertia.txt (at CoM), X-mirrored -->
+                        <inertial mass="0.68795278" pos="-0.00008014 0.00000370 0.04838748"
+                                  fullinertia="0.00372618 0.00373338 0.00014605 0 0.00000075 -0.00000005"/>
+
+                        <body name="connector_R" pos="0.0624 0 0.0713" euler="0 0.914 1.5708">
+                            <joint name="connector_joint_R" type="hinge" axis="-1 0 0" pos="-0.005 0 -0.034"
+                                   class="exo/passive_joint" range="-0.8 0.8"/>
+                            <geom name="connector_R_geom" type="mesh" mesh="connector"
+                                  class="exo/visual" material="mat_connector"/>
+                            <!-- connector (R): from real_inertia.txt (at CoM) - symmetric -->
+                            <inertial mass="0.00278131" pos="0 0 -0.02005725"
+                                      fullinertia="0.00000038 0.00000042 0.00000007 0 0 0"/>
+
+                            <!-- Site for closed loop constraint -->
+                            <site name="connector_R_to_backframe" pos="0 0 0"/>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <!-- ==================== EQUALITY CONSTRAINT PARAMETERS ==================== -->
+    <!--
+        MuJoCo doesn't support default classes for equality constraints.
+        Common parameters defined here for easy bulk modification:
+
+        CONSTRAINT PRESETS (copy-paste to all constraints):
+        ┌─────────────┬─────────────────┬───────────────────────────┐
+        │ Preset      │ solref          │ solimp                    │
+        ├─────────────┼─────────────────┼───────────────────────────┤
+        │ Stiff       │ "0.002 1"       │ "0.99 0.999 0.0001"       │ ← Current
+        │ Medium      │ "0.005 1"       │ "0.95 0.99 0.001"         │
+        │ Soft        │ "0.01 1"        │ "0.9 0.99 0.005"          │
+        │ Very Stiff  │ "0.001 1"       │ "0.995 0.9999 0.00001"    │
+        └─────────────┴─────────────────┴───────────────────────────┘
+
+        Parameters explained:
+        - solref: [timeconst, dampratio] - constraint stiffness/damping
+        - solimp: [dmin, dmax, width] - constraint tolerance bounds
+    -->
+
+    <equality>
+        <!-- Closed loop: backframe ↔ connector ball joints -->
+        <connect name="connector_ball_L"
+                 site1="backframe_to_connector_L"
+                 site2="connector_L_to_backframe"
+                 solref="0.002 1"
+                 solimp="0.9 0.9 0.0001"/>
+
+        <connect name="connector_ball_R"
+                 site1="backframe_to_connector_R"
+                 site2="connector_R_to_backframe"
+                 solref="0.002 1"
+                 solimp="0.9 0.9 0.0001"/>
+    </equality>
+
+    <!-- ==================== ACTUATORS ==================== -->
+    <actuator>
+        <!-- Hip joint motors (main actuation) -->
+        <motor name="left_hip_servo" joint="hip_joint_L" gear="50"
+               ctrllimited="true" ctrlrange="-1 1"/>
+        <motor name="right_hip_servo" joint="hip_joint_R" gear="-50"
+               ctrllimited="true" ctrlrange="-1 1"/>
+    </actuator>
+
+    <!-- ==================== SENSORS ==================== -->
+    <sensor>
+        <!-- Joint position sensors -->
+        <jointpos name="hip_L_pos" joint="hip_joint_L"/>
+        <jointpos name="hip_R_pos" joint="hip_joint_R"/>
+
+        <!-- Joint velocity sensors -->
+        <jointvel name="hip_L_vel" joint="hip_joint_L"/>
+        <jointvel name="hip_R_vel" joint="hip_joint_R"/>
+
+        <!-- Actuator force sensors -->
+        <actuatorfrc name="hip_L_frc" actuator="left_hip_servo"/>
+        <actuatorfrc name="hip_R_frc" actuator="right_hip_servo"/>
+    </sensor>
+
+    <!-- ==================== CONTACT EXCLUSIONS ==================== -->
+    <contact>
+        <!-- Exclude self-collision within same mechanism -->
+        <exclude body1="backframe_base_bottom" body2="backframe_base_top"/>
+        <exclude body1="backpipe_half_L" body2="joint_base_L"/>
+        <exclude body1="backpipe_half_R" body2="joint_base_R"/>
+        <exclude body1="joint_base_L" body2="pulley_L"/>
+        <exclude body1="joint_base_R" body2="pulley_R"/>
+        <exclude body1="pulley_L" body2="leg_L"/>
+        <exclude body1="pulley_R" body2="leg_R"/>
+        <exclude body1="joint_base_L" body2="hip_support_L"/>
+        <exclude body1="joint_base_R" body2="hip_support_R"/>
+        <exclude body1="joint_base_L" body2="tsa_motor_pipe_L"/>
+        <exclude body1="joint_base_R" body2="tsa_motor_pipe_R"/>
+        <exclude body1="tsa_motor_pipe_L" body2="connector_L"/>
+        <exclude body1="tsa_motor_pipe_R" body2="connector_R"/>
+
+        <!-- Exclude connector from backframe (they are connected via equality) -->
+        <exclude body1="backframe_base_bottom" body2="connector_L"/>
+        <exclude body1="backframe_base_bottom" body2="connector_R"/>
+        <exclude body1="backframe_base_bottom" body2="backpipe_half_L"/>
+        <exclude body1="backframe_base_bottom" body2="backpipe_half_R"/>
+    </contact>
+
+</mujoco>

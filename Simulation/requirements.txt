@@ -1,0 +1,48 @@
+# Physics simulation
+mujoco==3.3.3
+dm-control==1.0.31
+
+# RL environments
+gymnasium==0.29.1
+myosuite
+
+# RL training
+stable-baselines3[extra]
+torch
+tensorboard
+pink-noise-rl
+
+# Optimization
+cma==4.0.0
+scipy
+hydra-core
+omegaconf
+
+# Data processing
+numpy==2.2.6
+pandas
+h5py==3.12.1
+
+# Visualization
+matplotlib
+opencv-python==4.11.0.86
+imageio[ffmpeg]==2.37.0
+scikit-video==1.1.11
+Pillow
+tqdm
+mediapy
+
+# Utilities
+click
+termcolor
+flatten-dict
+gitpython
+packaging
+absl-py==2.1.0
+setuptools
+
+# Hardware interface (PASCO BLE sensor)
+pasco
+
+# Research RL (not on PyPI)
+git+https://github.com/aravindr93/mjrl.git

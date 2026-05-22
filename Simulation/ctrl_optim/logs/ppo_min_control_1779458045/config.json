@@ -1,0 +1,45 @@
+{
+  "total_timesteps": 5000,
+  "env_params": {
+    "symmetric": true,
+    "max_steps": 600,
+    "L_min": 0.25,
+    "L_max": 0.65,
+    "t_min": 0.0,
+    "t_max": 0.65,
+    "num_envs": 1
+  },
+  "reward_params": {
+    "w_torque": 0.0,
+    "w_muscle": 1.0,
+    "w_time": 0.0,
+    "support_fraction": 0.1,
+    "torque_ref": 20.0,
+    "quad_muscle_names": [
+      "vaslat_r",
+      "vasmed_r",
+      "vasint_r",
+      "vaslat_l",
+      "vasmed_l",
+      "vasint_l",
+      "recfem_r",
+      "recfem_l"
+    ],
+    "t_max_episode": 6.0,
+    "slack_penalty": 0.1,
+    "wall_penalty": 0.0
+  },
+  "ppo_params": {
+    "learning_rate": 0.0003,
+    "n_steps": 64,
+    "batch_size": 32,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "ent_coef": 0.01,
+    "clip_range": 0.2,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "device": "cpu"
+  }
+}

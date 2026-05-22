@@ -1,0 +1,234 @@
+<mujoco model="hipexo v2 with human v2">
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <!-- Multiple Robots with Torque-Controlled Exoskeleton  -->
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+
+  <!-- Include Common Scene -->
+  <include file="common_scene.xml"/>
+
+  <!-- Include Human -->
+  <include file="human_v2.xml"/>
+
+  <!-- Include Torque-Controlled Exoskeleton -->
+  <include file="hipexo_v2_real_inertia.xml"/>  
+
+  <default>
+    <!-- Harness Tendon Classes -->
+    <default class="Shoulder_harness_tendon">
+      <tendon limited="true" range="0 .6" width="0.01" rgba="0.2 0.4 0.4 1"/>
+    </default>
+
+    <default class="pelvis_harness_tendon">
+      <tendon limited="true" range="0 .8" width="0.01" rgba="0.2 0.4 0.4 1"/>
+    </default>
+
+    <default class="Hip_harness_tendon">
+      <!-- High stiffness for near-inelastic tendon (rigid torque transmission) -->
+      <tendon limited="true" range="0 .3" width="0.01" rgba="0.2 0.4 0.4 1"/>
+              <!-- stiffness="100000" damping="100" rgba="1 0 0 1"/> -->
+    </default>
+
+    <default class="flexible_tendon">
+      <tendon limited="true" range="0 .005" width="0.001"
+              stiffness="5000" damping="5" rgba="0 1 0 1"/>
+    </default>
+  </default>
+
+   <!-- Tendons -->
+  <tendon>
+    <!-- Shoulder Harness Tendons -->
+    <spatial name="shoulder_left_tendon" class="Shoulder_harness_tendon">
+      <site site="backframe_to_shoulder_top_L"/>
+      
+      <site site="shoulder_left_hook"/>
+      <site site="shoulder_left_hook_2"/>
+      <site site="shoulder_left_hook_3"/>
+      <site site="shoulder_left_hook_4"/>
+      <site site="shoulder_left_hook_5"/>
+
+      <site site="backframe_to_shoulder_bottom_L"/>
+    </spatial>
+
+    <spatial name="shoulder_right_tendon" class="Shoulder_harness_tendon">
+      <site site="backframe_to_shoulder_top_R"/>
+      
+      <site site="shoulder_right_hook"/>
+      <site site="shoulder_right_hook_2"/>
+      <site site="shoulder_right_hook_3"/>
+      <site site="shoulder_right_hook_4"/>
+      <site site="shoulder_right_hook_5"/>
+
+      <site site="backframe_to_shoulder_bottom_R"/>
+    </spatial>
+
+    <!-- <spatial name="shoulder_left_tendon_back" class="Shoulder_harness_tendon_top">
+      <site site="backframe_to_shoulder_top_L"/>
+      <site site="shoulder_left_hook_top"/>
+    </spatial>
+    <spatial name="shoulder_left_tendon_side" class="Shoulder_harness_tendon_bottom">
+      <site site="backframe_to_shoulder_bottom_L"/>
+      <site site="shoulder_left_hook_bottom"/>
+    </spatial>
+    <spatial name="shoulder_right_tendon_back" class="Shoulder_harness_tendon_top">
+      <site site="backframe_to_shoulder_top_R"/>
+      <site site="shoulder_right_hook_top"/>
+    </spatial>
+    <spatial name="shoulder_right_tendon_side" class="Shoulder_harness_tendon_bottom">
+      <site site="backframe_to_shoulder_bottom_R"/>
+      <site site="shoulder_right_hook_bottom"/>
+    </spatial> -->
+    
+    <!-- pelvis Harness Tendons -->
+    
+    <!-- <spatial name="pelvis_left_tendon_top" class="pelvis_harness_tendon">
+      <site site="hip_L_to_pelvis_L_top"/>
+      <site site="pelvis_left_hook_top"/>
+      <site site="pelvis_right_hook_top"/>
+      <site site="hip_R_to_pelvis_R_top"/>
+    </spatial>
+
+    <spatial name="pelvis_left_tendon_bottom" class="pelvis_harness_tendon">
+      <site site="hip_L_to_pelvis_L_bottom"/>
+      <site site="pelvis_left_hook_bottom"/>
+      <site site="pelvis_right_hook_bottom"/>
+      <site site="hip_R_to_pelvis_R_bottom"/>
+    </spatial> -->
+
+    <spatial name="pelvis_strap" class="pelvis_harness_tendon">
+      <site site="hip_L_to_pelvis_L_top"/>
+      <site site="pelvis_left_hook_top"/>
+      <site site="pelvis_right_hook_top"/>
+      <site site="hip_R_to_pelvis_R_top"/>
+      <site site="hip_R_to_pelvis_R_bottom"/>
+      <site site="pelvis_right_hook_bottom"/>
+      <site site="pelvis_right_hook_bottom_2"/>
+      <site site="pelvis_right_hook_bottom_3"/>
+      <site site="pelvis_left_hook_bottom_3"/>
+      <site site="pelvis_left_hook_bottom_2"/>
+      <site site="pelvis_left_hook_bottom"/>
+      <site site="hip_L_to_pelvis_L_bottom"/>
+      <site site="hip_L_to_pelvis_L_top"/>
+    </spatial>
+    <!-- <spatial name="pelvis_left_tendon_bottom" class="pelvis_harness_tendon">
+      <site site="hip_L_to_pelvis_L_bottom"/>
+      <site site="pelvis_left_hook_bottom"/>
+    </spatial> -->
+    <!-- <spatial name="pelvis_right_tendon_top" class="pelvis_harness_tendon">
+      <site site="hip_R_to_pelvis_R_top"/>
+      <site site="pelvis_right_hook_top"/>
+    </spatial>
+    <spatial name="pelvis_right_tendon_bottom" class="pelvis_harness_tendon">
+      <site site="hip_R_to_pelvis_R_bottom"/>
+      <site site="pelvis_right_hook_bottom"/>
+    </spatial> -->
+    
+    <!-- Hip Harness Tendons -->
+    
+    <spatial name="hip_right_tendon_top" class="Hip_harness_tendon">
+      <site site="leg_top_in_R"/>
+
+      <!-- <site site="hip_right_hook_back"/>
+      <site site="hip_right_hook_back_2"/>
+      <site site="hip_right_hook_back_3"/>
+      <site site="hip_right_hook_back_4"/>
+      <site site="hip_right_hook_back_5"/>
+      <site site="hip_right_hook_back_6"/> -->
+
+      <!-- <site site="hip_right_hook_back_top"/> -->
+      <site site="hip_right_hook_back_top_2"/>
+      <site site="hip_right_hook_back_top_3"/>
+      <site site="hip_right_hook_back_top_4"/>
+      <site site="hip_right_hook_back_top_5"/>
+      <site site="hip_right_hook_back_top_6"/>
+      <site site="hip_right_hook_back_top_7"/>
+
+      <site site="leg_top_out_R"/>
+      <!-- <site site="leg_top_in_R"/> -->
+    </spatial>
+
+    <spatial name="hip_right_tendon_bottom" class="Hip_harness_tendon">
+      <site site="leg_bottom_in_R"/>
+
+      <!-- <site site="hip_right_hook_back_bottom"/> -->
+      <site site="hip_right_hook_back_bottom_2"/>
+      <site site="hip_right_hook_back_bottom_3"/>
+      <site site="hip_right_hook_back_bottom_4"/>
+      <site site="hip_right_hook_back_bottom_5"/>
+      <site site="hip_right_hook_back_bottom_6"/>
+      <site site="hip_right_hook_back_bottom_7"/>
+
+      <site site="leg_bottom_out_R"/>
+      <!-- <site site="leg_bottom_in_R"/> -->
+    </spatial>
+
+    <spatial name="hip_left_tendon_top" class="Hip_harness_tendon">
+      <site site="leg_top_in_L"/>
+
+      <!-- <site site="hip_right_hook_back"/>
+      <site site="hip_right_hook_back_2"/>
+      <site site="hip_right_hook_back_3"/>
+      <site site="hip_right_hook_back_4"/>
+      <site site="hip_right_hook_back_5"/>
+      <site site="hip_right_hook_back_6"/> -->
+
+      <!-- <site site="hip_right_hook_back_top"/> -->
+      <site site="hip_left_hook_back_top_2"/>
+      <site site="hip_left_hook_back_top_3"/>
+      <site site="hip_left_hook_back_top_4"/>
+      <site site="hip_left_hook_back_top_5"/>
+      <site site="hip_left_hook_back_top_6"/>
+      <site site="hip_left_hook_back_top_7"/>
+
+      <site site="leg_top_out_L"/>
+      <!-- <site site="leg_top_in_R"/> -->
+    </spatial>
+
+    <spatial name="hip_left_tendon_bottom" class="Hip_harness_tendon">
+      <site site="leg_bottom_in_L"/>
+
+      <!-- <site site="hip_right_hook_back_bottom"/> -->
+      <site site="hip_left_hook_back_bottom_2"/>
+      <site site="hip_left_hook_back_bottom_3"/>
+      <site site="hip_left_hook_back_bottom_4"/>
+      <site site="hip_left_hook_back_bottom_5"/>
+      <site site="hip_left_hook_back_bottom_6"/>
+      <site site="hip_left_hook_back_bottom_7"/>
+
+      <site site="leg_bottom_out_L"/>
+      <!-- <site site="leg_bottom_in_R"/> -->
+    </spatial>
+
+    <!-- <spatial name="hip_left_tendon_back" class="Hip_harness_tendon">
+      <site site="leg_L_in_to_thigh_L_in"/>
+      <site site="hip_left_hook_back"/>
+    </spatial>
+
+    <spatial name="hip_right_tendon_back" class="Hip_harness_tendon">
+      <site site="leg_R_in_to_thigh_R_in"/>
+      <site site="hip_right_hook_back"/>
+    </spatial>
+    
+    <spatial name="hip_left_tendon_back_top" class="Hip_harness_tendon">
+      <site site="leg_L_out_to_thigh_L_out"/>
+      <site site="hip_left_hook_back"/>
+    </spatial>
+
+    <spatial name="hip_right_tendon_back_top" class="Hip_harness_tendon">
+      <site site="leg_R_out_to_thigh_R_out"/>
+      <site site="hip_right_hook_back"/>
+    </spatial> -->
+
+  </tendon>
+
+  <sensor>
+    <!-- <tendonforce name="hip_left_tension" tendon="hip_left_tendon_back"/> -->
+    <!-- <tendonforce name="hip_right_tension" tendon="hip_right_tendon_back"/> -->
+  </sensor>
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <!-- TENDON FORCE MEASUREMENT (For future hardware)      -->
+  <!-- Base sensors (IMU, encoders) inherited from hipexo_mod_torque.xml -->
+  <!-- Tendon forces accessible via data.ten_force[tendon_id] -->
+  <!-- hip_left_tendon_back, hip_right_tendon_back forces   -->
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+
+</mujoco>
