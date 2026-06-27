@@ -11,7 +11,7 @@ A Twisted String Actuator (TSA) based wearable exosuit designed to assist users 
 ## Results
 
 - **Muscle activation reduction:** 10% reduction in lower-limb muscle activation on a single test subject
-- **Intention detection accuracy:** 84.27% overall — limited by false positives from similar forward-lean motions (e.g. bending to tie shoelaces)
+- **Intention detection accuracy:** 84.38% overall — limited by false positives from similar forward-lean motions (e.g. bending to tie shoelaces)
 - **Control optimisation:** PPO-optimised TSA parameters (string length, staggered motor activation times) minimise quadriceps demand while tracking baseline kinematics
 
 ---
@@ -100,7 +100,7 @@ The intention detection system uses an ICM-20948 9-DOF IMU mounted on the torso.
 | Sustained | Held for duration | 300 ms |
 | Cooldown | Minimum gap between triggers | 5 s |
 
-**Performance:** 84.27% overall accuracy. The primary source of false positives is other forward-lean motions — bending over to tie shoelaces, pick something up from the floor, etc. — which produce a similar pitch signature.
+**Performance:** 84.38% overall accuracy. The primary source of false positives is other forward-lean motions — bending over to tie shoelaces, pick something up from the floor, etc. — which produce a similar pitch signature.
 
 Additional scripts:
 
