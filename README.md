@@ -23,8 +23,8 @@ A Twisted String Actuator (TSA) based wearable exosuit designed to assist users 
 │                   Wearable Exosuit                  │
 │                                                     │
 │  ┌──────────────────┐     ┌──────────────────────┐  │
-│  │ Intention         │────▶│ Hardware Control     │  │
-│  │ Detection (IMU)   │     │ (TSA Motors + EMG)   │  │
+│  │ Intention        │────▶│ Hardware Control     │  │
+│  │ Detection (IMU)  │     │ (TSA Motors + EMG)   │  │
 │  └──────────────────┘     └──────────────────────┘  │
 │                                    ▲                │
 │  ┌──────────────────┐              │                │
